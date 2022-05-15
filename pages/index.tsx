@@ -2,50 +2,11 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { MovieType, PostType, RandomUser } from '../models'
+import { useMyContext } from '../context'
+import { PostType } from '../models'
 
 const Home: NextPage = () => {
-  const [data, setData] = useState([])
-  const [user, setUser] = useState({} as RandomUser)
-  const [movies, setMovies] = useState({} as MovieType)
-
-  useEffect(() => {
-    fetch('https://jsonplaceholder.typicode.com/posts')
-    .then(response => response.json())
-    .then(json => {
-      setData(json)
-    })
-  }, [])
-
-
-  // implement context so random user generated same as in navbar
-  useEffect(() => {
-    fetch(`https://randomuser.me/api`)
-    .then(response => response.json())
-    .then(json => {
-      console.log("user fetched");
-      console.log(json);
-      
-      setUser(json)
-    })
-  }, [])
-
-  //implement context so that my favorite movies same in navbar
-  const getMovieDetail = async () => {
-    const url = `http://www.omdbapi.com/?i=tt1877830&apikey=64fee452`
-
-    const response = await fetch(url);
-    const responseJson = await response.json();
-
-    if (responseJson) {
-      setMovies(responseJson);
-    } 
-  }
-  useEffect(() => {
-    getMovieDetail()
-  }, [])
-
+  const { data, user, movies, handleSelectedPost } = useMyContext()
   return (
     <div>
       <Head>
@@ -66,7 +27,7 @@ const Home: NextPage = () => {
         <div className="flex flex-col gap-4">
           {data && data.map((d: PostType, index: number)=>{
             return (
-              <a key={index} className="cursor-pointer">
+              <a key={index} className="cursor-pointer" onClick={handleSelectedPost(d)}>
                 <div  className="rounded-lg bg-blue-400 p-5">
                 <Link href={`/post/${d.id}`}>
                   <div>
